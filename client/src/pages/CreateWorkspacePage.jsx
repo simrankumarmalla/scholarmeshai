@@ -199,3 +199,4 @@ const CreateWorkspacePage = () => {
 };
 
 export default CreateWorkspacePage;
+

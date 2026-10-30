@@ -276,3 +276,4 @@ const CopilotChat = ({ workspace, initialMessages = [] }) => {
 };
 
 export default CopilotChat;
+

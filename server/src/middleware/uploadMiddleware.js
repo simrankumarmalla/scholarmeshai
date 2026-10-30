@@ -23,3 +23,4 @@ export const uploadSingle = multer({
 }).single('document');
 
 export default uploadSingle;
+

@@ -178,3 +178,4 @@ const ClaimsTable = ({ claims = [] }) => {
 };
 
 export default ClaimsTable;
+

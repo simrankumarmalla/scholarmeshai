@@ -5,6 +5,7 @@ import uploadSingle from '../middleware/uploadMiddleware.js';
 import { extractTextFromUpload } from '../services/pdfParserService.js';
 import { analyzeSourceDocument } from '../services/geminiService.js';
 import { ingestSourceSchema } from '../validators/schemas.js';
+import { uploadDocumentToSupabase } from '../../../backend/src/supabaseStorage.js';
 
 const router = express.Router({ mergeParams: true });
 router.use(authenticateToken);
@@ -31,11 +32,23 @@ router.post('/', uploadSingle, async (req, res, next) => {
     let originalFilename = null;
     let wordCount = 0;
 
+    let storageInfo = null;
     if (req.file) {
       originalFilename = req.file.originalname;
       const parsed = await extractTextFromUpload(req.file.buffer, req.file.originalname, req.file.mimetype);
       rawContent = parsed.text;
       wordCount = parsed.wordCount;
+
+      try {
+        storageInfo = await uploadDocumentToSupabase({
+          fileBuffer: req.file.buffer,
+          originalFilename: req.file.originalname,
+          mimeType: req.file.mimetype,
+          workspaceId
+        });
+      } catch (err) {
+        console.warn('[Supabase Storage] Notice: File upload to bucket skipped/optional:', err.message);
+      }
     } else if (req.body.raw_content && req.body.raw_content.trim().length >= 40) {
       rawContent = req.body.raw_content.trim();
       wordCount = rawContent.split(/\s+/).filter(Boolean).length;
@@ -250,3 +263,4 @@ router.get('/claims/all', async (req, res, next) => {
 });
 
 export default router;
+

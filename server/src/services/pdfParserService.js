@@ -34,3 +34,4 @@ export async function extractTextFromUpload(fileBuffer, originalFilename, mimeTy
 export default {
   extractTextFromUpload
 };
+

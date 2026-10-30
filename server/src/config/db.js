@@ -391,10 +391,19 @@ export const initDb = async () => {
   loadFallbackData();
   const dbUrl = process.env.DATABASE_URL;
 
+  const isCloudPostgres = Boolean(dbUrl) && (
+    dbUrl.includes('supabase.co') ||
+    dbUrl.includes('supabase.com') ||
+    dbUrl.includes('render.com') ||
+    dbUrl.includes('neon.tech') ||
+    dbUrl.includes('pooler.supabase')
+  );
+
   try {
     pool = new Pool({
       connectionString: dbUrl,
-      connectionTimeoutMillis: 2500
+      connectionTimeoutMillis: isCloudPostgres ? 6000 : 2500,
+      ssl: isCloudPostgres ? { rejectUnauthorized: false } : undefined
     });
 
     // Test connection

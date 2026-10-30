@@ -22,38 +22,49 @@ Researchers and scientific analysts spend up to **60% of their operational bandw
 
 ---
 
-## 2. System Architecture & Tech Stack
+## 2. 3-Tier Multi-System Architecture (Client, Server & Backend)
+
+The codebase is structured into **3 independent, decoupled systems**:
 
 ```mermaid
-flowchart TD
-    User([Researcher Client]) -->|Vite + React 18 + Tailwind| Frontend[ScholarMesh Web Application]
-    Frontend -->|JWT Authorization: Bearer <token>| ExpressAPI[Node.js + Express REST API]
-    
-    subgraph Security & Ingestion Layer
-        ExpressAPI --> Helmet[Helmet + CORS Security]
-        ExpressAPI --> RateLimiter[Express Rate Limiter: General & AI Quotas]
-        ExpressAPI --> Multer[Multer Memory Buffer Ingestion]
-        Multer --> PDFParser[PDF-Parse + UTF-8 Text Decoder]
-        ExpressAPI --> ZodValidator[Zod Request & Schema Validators]
+flowchart LR
+    subgraph Vercel Tier
+        Client["client/ (Frontend React 18 + Vite)\n• Vercel Deployment (vercel.json)\n• VITE_API_BASE_URL (points to Render)\n• VITE_SUPABASE_URL\n• VITE_SUPABASE_ANON_KEY"]
     end
 
-    subgraph Data & Storage Layer
-        ExpressAPI --> PG[(PostgreSQL Pool / Resilient Fallback Engine)]
-        PG --> UsersTable[(users)]
-        PG --> WorkspacesTable[(workspaces)]
-        PG --> SourcesTable[(sources)]
-        PG --> ClaimsTable[(extracted_claims)]
-        PG --> SynthesisTable[(synthesis_reports)]
-        PG --> CopilotTable[(copilot_messages)]
+    subgraph Render Tier
+        Server["server/ (Express REST API)\n• Render Deployment (render.yaml)\n• JWT + bcrypt Auth & Zod Validation\n• Multer 10MB Ingestion\n• Gemini 2.5 Flash SDK"]
     end
 
-    subgraph AI Engine Layer
-        ExpressAPI --> GeminiSDK["@google/genai SDK (gemini-2.5-flash)"]
-        GeminiSDK --> ClaimExtractor["Single Source Claim Extraction & Rigor Scoring"]
-        GeminiSDK --> SynthesisEngine["Multi-Document Cross-Source Synthesis"]
-        GeminiSDK --> CopilotRAG["Citation-Grounded Copilot Q&A"]
+    subgraph Supabase Tier
+        Backend["backend/ (Supabase Engine & Data Layer)\n• SUPABASE_URL & SUPABASE_ANON_KEY\n• SUPABASE_SERVICE_ROLE_KEY (Admin)\n• DATABASE_URL (PostgreSQL Pooler)\n• Supabase Storage (research-documents)\n• Row-Level Security (RLS) Policies"]
     end
+
+    Client -->|REST API Calls & Bearer Tokens| Server
+    Client -.->|Direct Public Anon Read/Auth| Backend
+    Server -->|Admin Operations & SQL Pool| Backend
 ```
+
+### 1. `client/` — Vercel Frontend System
+- Configured specifically for **Vercel** (`client/vercel.json` with SPA routing and security headers).
+- Environment file: `client/.env` and `client/.env.example`
+- Uses `VITE_API_BASE_URL` (points to your Render URL in production), `VITE_SUPABASE_URL`, and `VITE_SUPABASE_ANON_KEY`.
+- Includes `client/src/lib/supabaseClient.js` using `@supabase/supabase-js`.
+
+### 2. `server/` — Render API Tier
+- Configured for **Render** (`render.yaml` with health checks on `/api/health`).
+- Environment file: `server/.env` and `server/.env.example`
+- Handles Express routes, Zod schemas, rate limiters, Multer memory buffers, and Google Gemini AI calls.
+
+### 3. `backend/` — Supabase Backend Engine
+- Dedicated Supabase service module.
+- Environment file: `backend/.env` and `backend/.env.example`
+- Contains:
+  - `backend/src/supabaseClient.js`: Initializes `@supabase/supabase-js` with public anon key and superuser `SUPABASE_SERVICE_ROLE_KEY` for backend administrative operations.
+  - `backend/src/supabaseStorage.js`: Manages the `research-documents` storage bucket for uploaded research files.
+  - `backend/src/supabaseDb.js`: PostgreSQL connection pool configured for Supabase Transaction Pooler (with SSL `rejectUnauthorized: false`).
+  - `backend/src/sql/supabase_schema.sql`: Complete production SQL script to paste into Supabase SQL Editor.
+  - `backend/src/testConnection.js`: Diagnostic tool to test Supabase auth, storage, and database connectivity.
 
 ### Full Technology Stack
 - **Frontend:** React 18+, Vite, React Router DOM v6+, Tailwind CSS (Slate-950 dark theme with Indigo-500 and Emerald-500 accents), Lucide React, Axios with request/response interceptors.
@@ -213,3 +224,4 @@ ScholarMesh AI comes pre-seeded with a comprehensive biomedical research workspa
 
 ScholarMesh AI is open-source under the **MIT License**.  
 Engineered for the **AI for Research & Knowledge Discovery Challenge** with the **Google Gemini 2.5 Flash** SDK (`@google/genai`).
+

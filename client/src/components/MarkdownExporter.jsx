@@ -119,3 +119,4 @@ ${decisions.map(d => `| **${d.action_title}** | ${d.recommendation} | ${d.eviden
 };
 
 export default MarkdownExporter;
+

@@ -311,3 +311,4 @@ const SavedSynthesesPage = () => {
 };
 
 export default SavedSynthesesPage;
+

@@ -91,3 +91,4 @@ CREATE INDEX IF NOT EXISTS idx_sources_workspace ON sources(workspace_id);
 CREATE INDEX IF NOT EXISTS idx_claims_workspace ON extracted_claims(workspace_id);
 CREATE INDEX IF NOT EXISTS idx_synthesis_workspace ON synthesis_reports(workspace_id);
 CREATE INDEX IF NOT EXISTS idx_copilot_workspace ON copilot_messages(workspace_id);
+

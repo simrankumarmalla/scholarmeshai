@@ -461,3 +461,4 @@ const SynthesisStudio = ({ workspace, sources = [], syntheses = [], onSynthesisG
 };
 
 export default SynthesisStudio;
+

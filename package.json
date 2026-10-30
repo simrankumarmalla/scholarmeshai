@@ -1,22 +1,26 @@
 {
   "name": "scholarmesh-ai",
   "version": "1.0.0",
-  "description": "ScholarMesh AI — Multi-Source Research Synthesis & Evidence Discovery Platform",
+  "description": "ScholarMesh AI — Multi-Source Research Synthesis & Evidence Discovery Platform (Client, Server & Supabase Backend)",
   "main": "server/src/index.js",
   "scripts": {
     "server": "npm --prefix server run dev",
     "client": "npm --prefix client run dev",
-    "build:client": "npm --prefix client run build",
+    "backend:test": "npm --prefix backend run test:connection",
     "start": "node server/src/index.js",
-    "install:all": "npm install && npm --prefix server install && npm --prefix client install"
+    "build:client": "npm --prefix client run build",
+    "build:vercel": "npm --prefix client run build",
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install && npm --prefix backend install"
   },
   "keywords": [
     "ai",
     "gemini",
+    "supabase",
+    "render",
+    "vercel",
     "research",
     "synthesis",
-    "literature-review",
-    "knowledge-discovery"
+    "evidence-discovery"
   ],
   "author": "ScholarMesh AI Team",
   "license": "MIT"

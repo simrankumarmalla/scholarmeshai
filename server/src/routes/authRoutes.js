@@ -133,3 +133,4 @@ router.get('/me', authenticateToken, async (req, res, next) => {
 });
 
 export default router;
+
