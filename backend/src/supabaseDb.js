@@ -40,3 +40,4 @@ export function createSupabasePool() {
 }
 
 export default createSupabasePool;
+

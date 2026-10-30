@@ -26,3 +26,4 @@ services:
         generateValue: true
       - key: CLIENT_URL
         sync: false
+

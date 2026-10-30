@@ -67,3 +67,4 @@ async function testSupabase() {
 }
 
 testSupabase();
+

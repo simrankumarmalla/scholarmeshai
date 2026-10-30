@@ -136,3 +136,4 @@ CREATE POLICY "Service role full access on copilot" ON public.copilot_messages
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('research-documents', 'research-documents', true)
 ON CONFLICT (id) DO NOTHING;
+
