@@ -387,9 +387,26 @@ export const getClient = async () => {
   }
 };
 
+export function sanitizeDatabaseUrl(rawUrl) {
+  if (!rawUrl) return rawUrl;
+  const match = rawUrl.match(/^(postgres(?:ql)?:\/\/)([^:]+):(.+)@([^@]+)$/);
+  if (match) {
+    const [, protocol, user, pass, hostAndDb] = match;
+    try {
+      const decoded = decodeURIComponent(pass);
+      const encodedPass = encodeURIComponent(decoded);
+      return `${protocol}${user}:${encodedPass}@${hostAndDb}`;
+    } catch {
+      return rawUrl;
+    }
+  }
+  return rawUrl;
+}
+
 export const initDb = async () => {
   loadFallbackData();
-  const dbUrl = process.env.DATABASE_URL;
+  const rawDbUrl = process.env.DATABASE_URL;
+  const dbUrl = sanitizeDatabaseUrl(rawDbUrl);
 
   const isCloudPostgres = Boolean(dbUrl) && (
     dbUrl.includes('supabase.co') ||
@@ -402,7 +419,7 @@ export const initDb = async () => {
   try {
     pool = new Pool({
       connectionString: dbUrl,
-      connectionTimeoutMillis: isCloudPostgres ? 6000 : 2500,
+      connectionTimeoutMillis: isCloudPostgres ? 4000 : 2500,
       ssl: isCloudPostgres ? { rejectUnauthorized: false } : undefined
     });
 

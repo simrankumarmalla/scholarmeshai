@@ -36,7 +36,11 @@ const RegisterPage = () => {
         setError(res.message || 'Registration failed.');
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'An error occurred during registration.');
+      if (err.message === 'Network Error' || err.code === 'ERR_NETWORK') {
+        setError('Cannot connect to API server. If using Render, the free instance may be waking up (please retry in 20-30 seconds). If running locally, ensure backend is running.');
+      } else {
+        setError(err.response?.data?.message || err.message || 'An error occurred during registration.');
+      }
     } finally {
       setLoading(false);
     }

@@ -24,8 +24,23 @@ app.use(helmet({
 }));
 
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true
+  origin: (origin, callback) => {
+    // Allow server-to-server or curl requests with no origin
+    if (!origin) return callback(null, true);
+
+    const clientUrl = process.env.CLIENT_URL;
+    if (!clientUrl || clientUrl === '*' || origin === clientUrl) {
+      return callback(null, origin);
+    }
+    // Automatically allow Vercel previews/production and localhost
+    if (origin.endsWith('.vercel.app') || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, origin);
+    }
+    return callback(null, origin);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Body Parsers
