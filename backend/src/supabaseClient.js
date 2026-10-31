@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import ws from 'ws';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -36,6 +37,9 @@ export const supabase = isSupabaseConfigured()
   ? createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: false
+      },
+      realtime: {
+        transport: ws
       }
     })
   : null;
@@ -47,6 +51,9 @@ export const supabaseAdmin = hasAdminPrivileges()
       auth: {
         autoRefreshToken: false,
         persistSession: false
+      },
+      realtime: {
+        transport: ws
       }
     })
   : supabase; // Fallback to standard client if service role not set yet

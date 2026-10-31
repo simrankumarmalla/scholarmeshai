@@ -5,7 +5,7 @@ import uploadSingle from '../middleware/uploadMiddleware.js';
 import { extractTextFromUpload } from '../services/pdfParserService.js';
 import { analyzeSourceDocument } from '../services/geminiService.js';
 import { ingestSourceSchema } from '../validators/schemas.js';
-import { uploadDocumentToSupabase } from '../../../backend/src/supabaseStorage.js';
+import { uploadDocumentToSupabase } from '../supabase/supabaseStorage.js';
 
 const router = express.Router({ mergeParams: true });
 router.use(authenticateToken);
